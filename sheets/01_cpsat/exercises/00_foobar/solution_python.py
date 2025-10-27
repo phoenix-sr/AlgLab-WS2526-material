@@ -7,7 +7,7 @@ def solve(instance: Instance) -> Solution:
     """
     numbers = instance.numbers
     return Solution(
-        number_a=numbers[0],
-        number_b=numbers[-1],
-        distance=abs(numbers[0] - numbers[-1]),
+        number_a=max(numbers),
+        number_b=min(numbers),
+        distance=abs(max(numbers) - min(numbers)),
     )
