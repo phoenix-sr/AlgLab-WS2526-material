@@ -37,24 +37,13 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     G = nx.Graph()
 
     # Add all endpoints as nodes in the graph
-    for vertex in instance.endpoints:
-        G.add_node(vertex)
+    #for vertex in instance.endpoints:
+    #    G.add_node(vertex)
 
-    # Add edges with weights to the graph
-    for v in instance.endpoints:
-        for w in instance.endpoints:
-            if v != w:  # Ensure not to check the same node
-                # Check if there is an edge between v and w
-                if any(
-                    edge.endpoint_a == v and edge.endpoint_b == w
-                    for edge in instance.connections
-                ) or any(
-                    edge.endpoint_a == w and edge.endpoint_b == v
-                    for edge in instance.connections
-                ):
-                    # Get the weight of the edge and add it to the graph
-                    weight = get_edge_weight(instance, v, w)
-                    G.add_edge(v, w, weight=weight)
+    edgeList = []
+
+    for edge in instance.connections:
+        G.add_edge(edge.endpoint_a, edge.endpoint_b, weight=edge.distance)
 
     return G
 
@@ -62,7 +51,9 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
 def distance(instance: ProblemInstance, u: str, v: str) -> int:
     """Calculate the shortest path distance between two endpoints in the network."""
     graph = build_weighted_graph(instance)
-    return nx.shortest_path_length(graph, u, v, weight="weight")
+    res = nx.dijkstra_path_length(graph, u, v, weight="weight")
+    #print(res)
+    return res
 
 
 class MaxPlacementsSolver:
@@ -131,7 +122,7 @@ class MaxPlacementsSolver:
 
 if __name__ == "__main__":
     # load instance
-    instance = ProblemInstance.parse_file("instances/instance_50.json")
+    instance = ProblemInstance.parse_file("instances/instance_100.json")
     # solve instance
     solver = MaxPlacementsSolver(instance)
     solution = solver.solve()
