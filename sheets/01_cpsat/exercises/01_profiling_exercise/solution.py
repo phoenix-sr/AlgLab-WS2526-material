@@ -36,23 +36,16 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     )
     G = nx.Graph()
 
-    # Add all endpoints as nodes in the graph
-    #for vertex in instance.endpoints:
-    #    G.add_node(vertex)
-
-    edgeList = []
-
+    # add all edges
     for edge in instance.connections:
         G.add_edge(edge.endpoint_a, edge.endpoint_b, weight=edge.distance)
 
     return G
 
 
-def distance(instance: ProblemInstance, u: str, v: str) -> int:
+def distance(graph: nx.Graph, u: str, v: str) -> int:
     """Calculate the shortest path distance between two endpoints in the network."""
-    graph = build_weighted_graph(instance)
     res = nx.dijkstra_path_length(graph, u, v, weight="weight")
-    #print(res)
     return res
 
 
@@ -64,6 +57,8 @@ class MaxPlacementsSolver:
     def __init__(self, instance: ProblemInstance):
         self.instance = instance
         self.model = cp_model.CpModel()
+        # build the graph once
+        self.graph = build_weighted_graph(instance)
 
         # Create a boolean variable for each approved endpoint
         # It will be True if the (approved) endpoint is selected, False otherwise
@@ -81,11 +76,16 @@ class MaxPlacementsSolver:
     def _add_distance_constraints(self):
         """Add constraints to ensure selected endpoints are not too close."""
         logging.info("Adding distance constraints")
+
+        # calculate all shortest paths
+        distances = dict(nx.all_pairs_dijkstra_path_length(self.graph))
+
         for endpoint1, endpoint2 in itertools.combinations(
             self.instance.approved_endpoints, 2
         ):
+            # just look up shortest path
             if (
-                distance(self.instance, endpoint1, endpoint2)
+                distances[endpoint1][endpoint2]
                 < self.instance.min_distance_between_placements
             ):
                 self.model.Add(self.vars[endpoint1] + self.vars[endpoint2] <= 1)
@@ -122,7 +122,7 @@ class MaxPlacementsSolver:
 
 if __name__ == "__main__":
     # load instance
-    instance = ProblemInstance.parse_file("instances/instance_100.json")
+    instance = ProblemInstance.parse_file("instances/instance_500.json")
     # solve instance
     solver = MaxPlacementsSolver(instance)
     solution = solver.solve()
