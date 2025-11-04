@@ -1,7 +1,7 @@
 import math
 
 from data_schema import Instance, Solution
-from ortools.sat.python.cp_model import CpModel, CpSolver
+from ortools.sat.python import cp_model
 
 
 class MultiKnapsackSolver:
@@ -17,7 +17,7 @@ class MultiKnapsackSolver:
     - solver (CpSolver): a CpSolver object representing the constraint programming solver.
     """
 
-    def __init__(self, instance: Instance, activate_toxic: bool = False):
+    def __init__(self, instance: Instance, activate_toxic: bool = True):
         """
         Initialize the solver with the given Multi-Knapsack instance.
 
@@ -27,9 +27,10 @@ class MultiKnapsackSolver:
         self.items = instance.items
         self.activate_toxic = activate_toxic
         self.capacities = instance.capacities
-        self.model = CpModel()
-        self.solver = CpSolver()
+        self.model = cp_model.CpModel()
+        self.solver = cp_model.CpSolver()
         self.solver.parameters.log_search_progress = True
+        self.solution = []
         # TODO: Implement me!
 
     def solve(self, timelimit: float = math.inf) -> Solution:
@@ -47,5 +48,63 @@ class MultiKnapsackSolver:
             return Solution(trucks=[])  # empty solution
         if timelimit < math.inf:
             self.solver.parameters.max_time_in_seconds = timelimit
-        # TODO: Implement me!
+            # TODO: Implement me!
+            # Taken from Google's example implementation of a multi-knapsack problem
+
+            num_items = len(self.items)
+            all_items = range(num_items)
+
+            num_bins = len(self.capacities)
+            all_bins = range(num_bins)
+
+            # create boolean vars for each item, x[i, b] = 1 if item i is packed in bin/truck b
+            x = {}
+            for i in all_items:
+                for b in all_bins:
+                    x[i, b] = self.model.new_bool_var(f"x_{i}_{b}")
+
+            # constraint to only pack each item in at most one bin/truck
+            for i in all_items:
+                self.model.add_at_most_one(x[i, b] for b in all_bins)
+
+            # constraint for truck/bin capacity
+            for b in all_bins:
+                self.model.add(
+                    sum(x[i, b] * self.items[i].weight for i in all_items)
+                    <= self.capacities[b]
+                )
+
+            toxic_items = [item.toxic for item in self.items]
+            # variables to track whether a truck/bin is used for toxic items
+            toxic_bins = [self.model.new_bool_var(f"t_{b}") for b in all_bins]
+
+            # if an iterm is in bin/truck b, make sure the items toxicity matches the trucks'/bin's
+            for b in all_bins:
+                for i in all_items:
+                    self.model.add(toxic_bins[b] == toxic_items[i]).only_enforce_if(
+                        x[i, b]
+                    )
+
+            # objective to maximize total value
+            objective = []
+            for i in all_items:
+                for b in all_bins:
+                    objective.append(
+                        cp_model.LinearExpr.term(x[i, b], self.items[i].value)
+                    )
+            self.model.maximize(cp_model.LinearExpr.sum(objective))
+
+            status = self.solver.solve(self.model)
+
+            # create list of lists of items per truck for solution
+            if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+                for b in all_bins:
+                    self.solution.append([])
+
+                    for i in all_items:
+                        if self.solver.value(x[i, b]) > 0:
+                            self.solution[b].append(self.items[i])
+
+                return Solution(trucks=self.solution)
+
         return Solution(trucks=[])  # empty solution
