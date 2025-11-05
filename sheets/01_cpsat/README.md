@@ -521,7 +521,7 @@ meant for two different weeks):
 1. [Exercise: Foobar](./exercises/00_foobar/) A simple exercise to get familiar
    with our workflow.
 2. [Exercise: Scalene](./exercises/01_profiling_exercise/) Learn about profiling
-   and networkx by fixing the worst code I have every written!
+   and networkx by fixing the worst code I have ever written!
 
 ### Part B:
 
