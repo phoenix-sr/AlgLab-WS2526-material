@@ -51,10 +51,13 @@ class CycleLimitingCrossoverTransplantSolver:
             x[idx] = self.model.new_bool_var(f"x_{idx}")
 
         # constraint: donors donate only one organ
+        donor_cycle_map = {node: [] for node in G.nodes}
+        for idx, cycle in enumerate(cycles):
+            for node in cycle:
+                donor_cycle_map[node].append(idx)
+
         for donor in G.nodes:
-            self.model.add_at_most_one(
-                x[idx] for idx, cycle in enumerate(cycles) if donor in cycle
-            )
+            self.model.add_at_most_one(x[idx] for idx in donor_cycle_map[donor])
 
         # objective: maximize number of transplants
         self.model.maximize(

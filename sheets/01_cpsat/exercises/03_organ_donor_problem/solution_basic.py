@@ -64,10 +64,17 @@ class CrossoverTransplantSolver:
 
         # constraint: donor only donates if their partner recieves an organ
         for donor in G.nodes:
-            self.model.add(
-                sum([x[donor, recipient] for recipient in G.successors(donor)])
-                <= sum([x[k, donor] for k in G.predecessors(donor)])
-            )
+            # get outgoing and incoming edges for the donor
+            outgoing = [x[donor, recipient] for recipient in G.successors(donor)]
+            incoming = [x[k, donor] for k in G.predecessors(donor)]
+
+            # booleans to track if the donor donates or receives an organ
+            y_out = self.model.new_bool_var(f"out_{donor}")
+            y_in = self.model.new_bool_var(f"in_{donor}")
+
+            self.model.add(sum(outgoing) == y_out)
+            self.model.add(sum(incoming) == y_in)
+            self.model.add(y_out <= y_in)
 
         # objective: maximize number of transplants
         self.model.maximize(sum(x.values()))
