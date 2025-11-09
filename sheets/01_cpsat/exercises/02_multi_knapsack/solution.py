@@ -17,7 +17,7 @@ class MultiKnapsackSolver:
     - solver (CpSolver): a CpSolver object representing the constraint programming solver.
     """
 
-    def __init__(self, instance: Instance, activate_toxic: bool = True):
+    def __init__(self, instance: Instance, activate_toxic: bool = False):
         """
         Initialize the solver with the given Multi-Knapsack instance.
 
@@ -49,7 +49,7 @@ class MultiKnapsackSolver:
         if timelimit < math.inf:
             self.solver.parameters.max_time_in_seconds = timelimit
             # TODO: Implement me!
-            # Taken from Google's example implementation of a multi-knapsack problem
+            # Mostly taken from Google's example implementation of a multi-knapsack problem
 
             num_items = len(self.items)
             all_items = range(num_items)
@@ -69,30 +69,24 @@ class MultiKnapsackSolver:
 
             # constraint for truck/bin capacity
             for b in all_bins:
-                self.model.add(
-                    sum(x[i, b] * self.items[i].weight for i in all_items)
-                    <= self.capacities[b]
-                )
+                self.model.add(sum(x[i, b] * self.items[i].weight for i in all_items) <= self.capacities[b])
 
-            toxic_items = [item.toxic for item in self.items]
-            # variables to track whether a truck/bin is used for toxic items
-            toxic_bins = [self.model.new_bool_var(f"t_{b}") for b in all_bins]
+            if self.activate_toxic:
+                toxic_items = [item.toxic for item in self.items]
+                # variables to track whether a truck/bin is used for toxic items
+                toxic_bins = [self.model.new_bool_var(f"t_{b}") for b in all_bins]
 
-            # if an iterm is in bin/truck b, make sure the items toxicity matches the trucks'/bin's
-            for b in all_bins:
-                for i in all_items:
-                    self.model.add(toxic_bins[b] == toxic_items[i]).only_enforce_if(
-                        x[i, b]
-                    )
+                # if an iterm is in bin/truck b, make sure the items toxicity matches the trucks'/bin's
+                for b in all_bins:
+                    for i in all_items:
+                        self.model.add(toxic_bins[b] == toxic_items[i]).only_enforce_if(x[i, b])
 
             # objective to maximize total value
             objective = []
             for i in all_items:
                 for b in all_bins:
-                    objective.append(
-                        cp_model.LinearExpr.term(x[i, b], self.items[i].value)
-                    )
-            self.model.maximize(cp_model.LinearExpr.sum(objective))
+                    objective.append(x[i, b] * self.items[i].value)
+            self.model.maximize(sum(objective))
 
             status = self.solver.solve(self.model)
 
