@@ -5,7 +5,7 @@ from knapsack_bnb.branching_strategy import MyBranchingStrategy
 from knapsack_bnb.heuristics import MyHeuristic
 from knapsack_bnb.instance import Instance, Item
 from knapsack_bnb.relaxation import MyRelaxationSolver
-from knapsack_bnb.search_strategy import SearchStrategy, my_search_order
+from knapsack_bnb.search_strategy import SearchStrategy, best_first
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,7 +32,7 @@ def run_trivial_instance():
     bnb = BnBSearch(
         instance,
         relaxation=MyRelaxationSolver(),
-        search_strategy=SearchStrategy(priority=my_search_order),
+        search_strategy=SearchStrategy(priority=best_first),
         branching_strategy=MyBranchingStrategy(),
         heuristics=MyHeuristic(),
     )

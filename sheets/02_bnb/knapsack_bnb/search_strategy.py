@@ -88,10 +88,10 @@ class SearchStrategy:
 # This stub returns a constant key.
 
 
-def my_search_order(node: BnBNode) -> Any:
+def best_first(node: BnBNode) -> Any:
     """
     Example default: constant priority.
     """
-    return 0
+    return -node.relaxed_solution.upper_bound
 
 
