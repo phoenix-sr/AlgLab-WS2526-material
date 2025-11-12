@@ -102,12 +102,41 @@ class MyRelaxationSolver(RelaxationSolver):
     def solve(
         self, instance: Instance, decisions: BranchingDecisions
     ) -> RelaxedSolution:
-        # placeholder: behave like NaiveRelaxationSolver
         used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
+        value = sum(item.value for item, x in zip(instance.items, decisions) if x == 1)
         if used > instance.capacity:
             return RelaxedSolution.create_infeasible(instance)
-        selection = [0.0 if x == 0 else 1.0 for x in decisions]
+
+        selection = [0.0 if x in (None, 0) else 1.0 for x in decisions]
+
+        items = instance.items
+        capacity = instance.capacity
+
+        n = len(items)
+        val_to_weight = [
+            ((items[i].value / items[i].weight), items[i].value, items[i].weight, i)
+            for i in range(n)
+        ]
+        val_to_weight.sort(reverse=True)
+
+        total_value = value
+        total_weight = used
+
+        for ratio, value, weight, idx in val_to_weight:
+            # skip fixed items
+            if selection[idx] != 0:
+                continue
+
+            if total_weight + weight <= capacity:
+                selection[idx] = 1.0
+                total_value += value
+                total_weight += weight
+            else:
+                fraction = (capacity - total_weight) / weight
+                selection[idx] = fraction
+                total_value += value * fraction
+                total_weight += weight * fraction
+                break
+
         upper = sum(item.value * sel for item, sel in zip(instance.items, selection))
         return RelaxedSolution(instance, selection, upper)
-
-

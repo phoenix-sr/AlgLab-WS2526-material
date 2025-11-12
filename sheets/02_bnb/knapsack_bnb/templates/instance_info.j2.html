@@ -21,17 +21,22 @@
       </tr>
     </thead>
     <tbody>
-      {% for item in instance.items %} {% set value_weight_ratio = (item.value/item.weight)|round(2) %} {% set
-      item_choice = best_solution.selection[loop.index-1] %}
+      {% for item in instance.items %} {% set value_weight_ratio =
+      (item.value/item.weight)|round(2) %} {% set item_choice =
+      best_solution.selection[loop.index-1] %}
       <tr>
         <th scope="row" class="right-border-cell">{{loop.index-1}}</th>
         <td>{{item.value}}</td>
         <td>{{item.weight}}</td>
         <td class="right-border-cell">{{value_weight_ratio}}</td>
         {% if item_choice == 1 %}
-        <td data-sort="{{value_weight_ratio}}" class="text-success">{{item_choice}}</td>
+        <td data-sort="{{value_weight_ratio}}" class="text-success">
+          {{item_choice}}
+        </td>
         {% else %}
-        <td data-sort="{{ -1 / value_weight_ratio }}" class="text-danger">{{item_choice}}</td>
+        <td data-sort="{{ -1 / value_weight_ratio }}" class="text-danger">
+          {{item_choice}}
+        </td>
         {% endif %}
       </tr>
       {% endfor %}

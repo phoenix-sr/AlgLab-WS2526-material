@@ -59,13 +59,17 @@ class MyBranchingStrategy(BranchingStrategy):
     """
 
     def make_branching_decisions(self, node: BnBNode) -> Tuple[BranchingDecisions, ...]:
-        # placeholder: branch on the first unfixed variable
-        first_unfixed = min(
-            (i for i, val in enumerate(node.branching_decisions) if val is None),
-            default=-1,
-        )
-        if first_unfixed < 0:
+        items = node.relaxed_solution.instance.items
+        unfixed = [
+            i
+            for i, val in enumerate(node.relaxed_solution.selection)
+            if node.branching_decisions[i] is None and 0.0 < val < 1.0
+        ]
+        val_to_weight = [(items[i].value / items[i].weight, i) for i in unfixed]
+
+        if not unfixed:
             return ()
-        return node.branching_decisions.split_on(first_unfixed)
 
+        _, best = max(val_to_weight, key=lambda x: x[0])
 
+        return node.branching_decisions.split_on(best)

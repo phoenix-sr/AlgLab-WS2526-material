@@ -1,20 +1,9 @@
 {% macro value_cell(solution) -%}
 <td>
-  {% if solution %}
-    {{ solution.value() | round(2) }}
-  {% else %}
-    -
-  {% endif %}
+  {% if solution %} {{ solution.value() | round(2) }} {% else %} - {% endif %}
 </td>
-{%- endmacro %}
-{% macro weight_cell(solution) -%}
-<td>
-  {% if solution %}
-    {{ solution.weight() }}
-  {% else %}
-    -
-  {% endif %}
-</td>
+{%- endmacro %} {% macro weight_cell(solution) -%}
+<td>{% if solution %} {{ solution.weight() }} {% else %} - {% endif %}</td>
 {%- endmacro %}
 
 <div class="table-responsive mx-auto" style="max-width: 600px">
@@ -30,15 +19,13 @@
     <tbody class="table-group-divider">
       <tr>
         <th scope="row" class="right-border-cell">&sum; Value</th>
-        {{ value_cell(current_heuristic) }}
-        {{ value_cell(best_solution) }}
-        {{ value_cell(current_relaxed) }}
+        {{ value_cell(current_heuristic) }} {{ value_cell(best_solution) }} {{
+        value_cell(current_relaxed) }}
       </tr>
       <tr>
         <th scope="row" class="right-border-cell">&sum; Weight</th>
-        {{ weight_cell(current_heuristic) }}
-        {{ weight_cell(best_solution) }}
-        {{ weight_cell(current_relaxed) }}
+        {{ weight_cell(current_heuristic) }} {{ weight_cell(best_solution) }} {{
+        weight_cell(current_relaxed) }}
       </tr>
     </tbody>
   </table>

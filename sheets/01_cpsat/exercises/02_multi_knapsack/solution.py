@@ -69,7 +69,10 @@ class MultiKnapsackSolver:
 
             # constraint for truck/bin capacity
             for b in all_bins:
-                self.model.add(sum(x[i, b] * self.items[i].weight for i in all_items) <= self.capacities[b])
+                self.model.add(
+                    sum(x[i, b] * self.items[i].weight for i in all_items)
+                    <= self.capacities[b]
+                )
 
             if self.activate_toxic:
                 toxic_items = [item.toxic for item in self.items]
@@ -79,7 +82,9 @@ class MultiKnapsackSolver:
                 # if an iterm is in bin/truck b, make sure the items toxicity matches the trucks'/bin's
                 for b in all_bins:
                     for i in all_items:
-                        self.model.add(toxic_bins[b] == toxic_items[i]).only_enforce_if(x[i, b])
+                        self.model.add(toxic_bins[b] == toxic_items[i]).only_enforce_if(
+                            x[i, b]
+                        )
 
             # objective to maximize total value
             objective = []

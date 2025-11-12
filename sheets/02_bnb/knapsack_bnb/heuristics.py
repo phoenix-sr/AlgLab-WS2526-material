@@ -10,7 +10,6 @@ You can implement heuristics by subclassing `Heuristics` and overriding `search(
 `search` should yield zero or more feasible `RelaxedSolution` objects.
 """
 
-import math
 from abc import ABC, abstractmethod
 from typing import Tuple
 
@@ -23,6 +22,7 @@ class HeuristicSolution(RelaxedSolution):
     A feasible heuristic solution.
     Inherits from `RelaxedSolution` for compatibility with the rest of the codebase.
     """
+
     def copy(self) -> "HeuristicSolution":
         """
         Return a deep copy of this heuristic solution.
@@ -32,7 +32,7 @@ class HeuristicSolution(RelaxedSolution):
             list(self.selection),
             self.upper_bound,
         )
-    
+
 
 class Heuristics(ABC):
     """
@@ -42,7 +42,9 @@ class Heuristics(ABC):
     """
 
     @abstractmethod
-    def search(self, instance: Instance, relaxed: RelaxedSolution) -> Tuple[HeuristicSolution, ...]:
+    def search(
+        self, instance: Instance, relaxed: RelaxedSolution
+    ) -> Tuple[HeuristicSolution, ...]:
         """
         Return a tuple of feasible `HeuristicSolution` objects for pruning.
         """
@@ -57,10 +59,10 @@ class MyHeuristic(Heuristics):
     if it is already feasible (integral and within capacity).
     """
 
-    def search(self, instance: Instance, relaxed: RelaxedSolution) -> Tuple[HeuristicSolution, ...]:
-        if relaxed.does_obey_capacity_constraint() and relaxed.is_integral():
-            heuristic_sol = HeuristicSolution(instance, relaxed.selection, relaxed.upper_bound)
-            return (heuristic_sol,)
-        return ()
+    def search(
+        self, instance: Instance, relaxed: RelaxedSolution
+    ) -> Tuple[HeuristicSolution, ...]:
+        selection = [1.0 if x == 1.0 else 0.0 for x in relaxed.selection]
+        value = sum(item.value * sel for item, sel in zip(instance.items, selection))
 
-
+        return (HeuristicSolution(instance, selection, value),)

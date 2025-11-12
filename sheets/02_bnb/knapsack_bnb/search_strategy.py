@@ -93,5 +93,3 @@ def best_first(node: BnBNode) -> Any:
     Example default: constant priority.
     """
     return -node.relaxed_solution.upper_bound
-
-
