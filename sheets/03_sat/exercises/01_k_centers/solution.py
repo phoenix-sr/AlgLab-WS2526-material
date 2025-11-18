@@ -139,7 +139,7 @@ class KCentersSolver:
         centers = self.solve_heur(k)
         obj = self.distances.max_dist(centers)
 
-        candidates = sorted(set(c for c in self.sorted_dists if c <= obj))
+        candidates = list(c for c in self.sorted_dists if c <= obj)
 
         low = 0
         high = len(candidates) - 1
