@@ -1,14 +1,26 @@
+<<<<<<< HEAD
 {% macro solution_cell(solution, iteration, sortkey) -%} {% if solution %} {%
 set val = solution.selection[iteration] %}
+=======
+{% macro solution_cell(solution, iteration, sortkey) -%}
+{% if solution %}
+{% set val = solution.selection[iteration] %}
+>>>>>>> upstream/main
 <td
   data-sort="{{sortkey * val}}"
-  class="{% if val == 1 %}text-success{% elif val == 0 %}text-danger{% else %}text-warning-emphasis{% endif %}"
+  class="{% if val == 1 %}text-success{% elif val == 0 %}text-danger{% else %}text-warning-emphasis fw-semibold{% endif %}"
 >
   {{val | round(2)}}
 </td>
 {% else %}
+<<<<<<< HEAD
 <td>-</td>
 {% endif %} {%- endmacro%}
+=======
+  <td>-</td>
+{% endif %}
+{%- endmacro%}
+>>>>>>> upstream/main
 
 <div class="table-responsive mx-auto" style="max-width: 600px">
   <table class="table table-sm table-hover m-0" id="iteration-table">

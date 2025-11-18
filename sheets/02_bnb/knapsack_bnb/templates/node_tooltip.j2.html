@@ -30,20 +30,26 @@
     <i class="bi bi-check-circle-fill text-success"></i> Enforced Items:
   </dt>
   <dd class="col-sm-6">
-    {% for item in included_items %} {{ item }} {% if not loop.last %}, {% endif
-    %} {% endfor %}
+    {% for item in included_items %}
+      {{ item }}
+      {% if not loop.last %},
+      {% endif %}
+    {% endfor %}
   </dd>
   <dt class="col-sm-6">
     &nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:
   </dt>
   <dd class="col-sm-6">{{included_weight}}</dd>
-  {% endif %} {% if excluded_items %}
-  <dt class="col-sm-6">
-    <i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:
-  </dt>
+  {% endif %}
+
+  {% if excluded_items %}
+  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>
   <dd class="col-sm-6">
-    {% for item in excluded_items %} {{item}} {% if not loop.last %}, {% endif
-    %} {% endfor %}
+    {% for item in excluded_items %}
+      {{item}}
+      {% if not loop.last %},
+      {% endif %}
+    {% endfor %}
   </dd>
   {% endif %}
 </div>

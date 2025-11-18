@@ -84,7 +84,11 @@ familiarity with the topics covered.
 > have encountered before. You will need to carefully study both the course
 > material and the provided references to fully understand these concepts. Given
 > the complexity, I expect you to ask more questions and seek assistance
-> frequently.
+> frequently. Please do take the time to really engage with the material and do
+> not just iterate with ChatGPT until the tests pass. First, we will notice in
+> the code interviews if you really understood what you just did and second, you
+> will not learn anything this way. Use ChatGPT as a personalized tutor to
+> deepen your understanding but do not let it do the work for you.
 
 ## Prerequisites
 
